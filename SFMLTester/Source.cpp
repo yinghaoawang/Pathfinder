@@ -5,7 +5,7 @@
 #include "Tile.h"
 #include "Graph.h"
 
-sf::RectangleShape tileToRect(Tile tile, float size, float xPos, float yPos, float xOffset = 0, float yOffset = 0, bool isSource = false, bool isDest = false) {
+sf::RectangleShape tileToRect(Tile &tile, float size, float xPos, float yPos, float xOffset = 0, float yOffset = 0, bool isSource = false, bool isDest = false) {
 	sf::RectangleShape rect(sf::Vector2f(size, size));
 
 	if(tile.isWall()) rect.setFillColor(sf::Color::Cyan);
@@ -22,23 +22,39 @@ sf::RectangleShape tileToRect(Tile tile, float size, float xPos, float yPos, flo
 	return rect;
 }
 
+void drawGraph(sf::RenderWindow &window, Graph *graph, int size = 5, int xOffset = 10, int yOffset = 10) {
+	for(int y = 0; y < graph->getHeight(); ++y) {
+		for(int x = 0; x < graph->getWidth(); ++x) {
+			Tile &tile = graph->getTileAt(x, y);
+			int xPos = x;
+			int yPos = y;
+			window.draw(tileToRect(tile, size, xPos, yPos, xOffset, yOffset, graph->isSource(x, y), graph->isDest(x, y)));
+		}
+	}
+}
+
 int main() {
+	// Random seed
 	srand(time(0));
 	sf::RenderWindow window(sf::VideoMode(800, 640), "SFML works!");
 	sf::CircleShape shape(100.f);
 	shape.setFillColor(sf::Color::Green);
 	Graph *graph = new Graph(std::string(
-		"##      ###  ## #  ##     D\n"
-		"#  #   #               # # \n"
-		"#  ## ### ### # ####       \n"
-		"S                       # #\n"
+		"##      ###  ## #  ##############################      D\n"
+		"#  #   #           ##############################    # # \n"
+		"#  ## ### ### # ###                                      \n"
+		"S                   ##############################    # #\n"
 	));
+
+	Graph *graph2 = new Graph(4, 2);
+	graph2->randomizeTiles();
 
 	/*
 	graph->randomizeTiles();
 	std::cout << *graph << std::endl;
 	graph->randomizeTiles();
 	*/
+
 	std::cout << *graph << std::endl;
 	while (window.isOpen()) {
 		sf::Event event;
@@ -52,15 +68,7 @@ int main() {
 		float size = 20;
 		float xOffset = 10;
 		float yOffset = 10;
-		for(int i = 0; i < graph->getRows(); ++i) {
-			for(int j = 0; j < graph->getCols(); ++j) {
-				Tile &tile = graph->getTileAt(i, j);
-				int xPos = j;
-				int yPos = graph->getCols() - 1 - i;
-				bool isDest = graph->isDest(i, j);
-				window.draw(tileToRect(tile, size, xPos, yPos, xOffset, yOffset, graph->isSource(i, j), isDest));
-			}
-		}
+		drawGraph(window, graph2);
 		window.display();
 	}
 

@@ -5,19 +5,20 @@
 
 class Graph {
 private:
-	int rows, cols;
+	int width, height;
+	// index 0 is x, index 1 is y
 	int source[2];
 	int dest[2];
 	Tile **adj;
 public:
 	void init();
-	Graph(int r, int c);
-	bool isSource(int row, int col);
-	bool isDest(int row, int col);
+	Graph(int width, int height);
+	bool isSource(int x, int y);
+	bool isDest(int x, int y);
 	Graph(std::string strMap);
-	int getRows();
-	int getCols();
-	Tile getTileAt(int r, int c);
+	int getWidth();
+	int getHeight();
+	Tile getTileAt(int x, int y);
 
 	void randomizeTiles();
 	friend std::ostream& operator<<(std::ostream &os, Graph &g);
