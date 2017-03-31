@@ -12,13 +12,15 @@
 Grid::Grid(int w, int h) : width(w), height(h) {
 	width = w;
 	height = h;
+	source = std::make_pair(UNDEF, UNDEF);
+	dest = std::make_pair(UNDEF, UNDEF);
 	// Instantiate empty tiles with ascending values according to their x and yumns (see below comments)
 	tiles = new Tile*[height];
-	for(int i = 0; i < height; ++i) {
-		tiles[i] = new Tile[width];
+	for(int y = 0; y < height; ++y) {
+		tiles[y] = new Tile[width];
 	}
-	for(int x = 0; x < width; ++x) {
-		for(int y = 0; y < height; ++y) {
+	for(int y = 0; y < height; ++y) {
+		for(int x = 0; x < width; ++x) {
 			// i.e Value of a 3x3 map i (from bottom to top) 0 1 2, 3 4 5, 6 7 8
 			tiles[y][x].setValue(height * y + x);
 		}
@@ -32,6 +34,7 @@ std::list<std::pair<int,int>> Grid::getNeighbors(int xPos, int yPos) {
 		for(int y = -1; y <= 1; ++y) {
 			if(std::abs(x) == std::abs(y)) continue; // diagonal are not neighbors
 			if(x + xPos < 0 || y + yPos < 0 || x + xPos >= width || y + yPos >= height) continue; // must be in bounds
+			if(getTileAt(x + xPos, y + yPos).isWall()) continue; // ignores walls
 			result.push_back(std::make_pair(x + xPos, y + yPos));
 		}
 	}
@@ -44,6 +47,16 @@ std::list<std::pair<int, int>> Grid::getNeighbors(std::pair<int, int> vertex) {
 // Returns a list of coordinates of the shortest path from source to dest using Dijkstra's algorithm
 std::list<std::pair<int, int>> Grid::findPathWithDijkstra() {
 	std::list<std::pair<int, int>> result;
+
+	// if source and/or dest is not defined then no path exists
+	if(source.first == UNDEF || source.second == UNDEF) {
+		std::cout << "Source not defined, no path exists" << std::endl;
+		return result;
+	}
+	if(dest.first == UNDEF || dest.second == UNDEF) {
+		std::cout << "Dest is not defined, no path exists" << std::endl;
+		return result;
+	}
 
 	std::list<std::pair<int, int>> unvisited;
 	int **dist = new int*[height];
@@ -60,15 +73,6 @@ std::list<std::pair<int, int>> Grid::findPathWithDijkstra() {
 		}
 	}
 
-	// if source and/or dest is not defined then no path exists
-	if(source.first == UNDEF || source.second == UNDEF) {
-		std::cout << "Source not defined, no path exists" << std::endl;
-		return result;
-	}
-	if(dest.first == UNDEF || dest.second == UNDEF) {
-		std::cout << "Dest is not defined, no path exists" << std::endl;
-		return result;
-	}
 	dist[source.second][source.first] = 0; // dist from source to source
 	std::cout << unvisited.size() << std::endl;
 
@@ -77,9 +81,11 @@ std::list<std::pair<int, int>> Grid::findPathWithDijkstra() {
 
 	while(!unvisited.empty()) {
 		std::pair<int, int> u = getMinVertex(unvisited, dist);
+		if(u.first == UNDEF || u.second == UNDEF) break;
 		unvisited.remove(u);
 		
-
+		std::cout << unvisited.size() << std::endl;
+		std::cout << "(" << u.first << ", " << u.second << "): " << dist[u.second][u.first] << std::endl;
 		std::list<std::pair<int, int>> neighbors = getNeighbors(u);
 		for(auto it = neighbors.begin(), end = neighbors.end(); it != end; ++it) {
 			std::pair<int, int> v = *it;
@@ -104,7 +110,14 @@ std::list<std::pair<int, int>> Grid::findPathWithDijkstra() {
 		}
 	}
 
-	// TODO
+	// free
+	for(int y = 0; y < height; ++y) {
+		delete[] parent[y];
+		delete[] dist[y];
+	}
+	delete parent;
+	delete dist;
+
 	return result;
 }
 
@@ -176,8 +189,9 @@ Grid::Grid(std::string strMap) {
 
 Grid::~Grid() {
 	for(int y = 0; y < height; ++y) {
-		delete tiles[y];
+		delete[] tiles[y];
 	}
+	
 	delete tiles;
 }
 

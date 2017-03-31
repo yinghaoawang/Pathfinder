@@ -2,6 +2,10 @@
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
+#ifdef _DEBUG
+	#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
+	#define new DEBUG_NEW
+#endif
 
 #include <SFML/Graphics.hpp>
 #include <iostream>
@@ -46,9 +50,10 @@ void drawPath(sf::RenderWindow &window, Grid *grid, std::list<std::pair<int, int
 int main() {
 	// Detects memory leaks
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
 	// Random seed
 	srand(time(0));
-	sf::RenderWindow window(sf::VideoMode(800, 640), "SFML works!");
+	sf::RenderWindow window(sf::VideoMode(800, 640), "Pathfinder");
 	sf::CircleShape shape(100.f);
 	shape.setFillColor(sf::Color::Green);
 	Grid *graph1 = new Grid(std::string(
@@ -60,7 +65,9 @@ int main() {
 
 	Grid *graph2 = new Grid(4, 2);
 	graph2->randomizeTiles();
-	std::list<std::pair<int, int>> path = graph1->findPathWithDijkstra();
+
+	std::list<std::pair<int, int>> path1 = graph1->findPathWithDijkstra();
+	std::list<std::pair<int, int>> path2 = graph2->findPathWithDijkstra();
 
 	/*
 	graph->randomizeTiles();
@@ -82,10 +89,16 @@ int main() {
 		float xOffset = 10;
 		float yOffset = 10;
 		drawGrid(window, graph1, size, xOffset, yOffset);
-		drawPath(window, graph1, path, size, xOffset, yOffset);
+		drawPath(window, graph1, path1, size, xOffset, yOffset);
+
+		yOffset = 2 * yOffset + size * graph1->getHeight();
+		drawGrid(window, graph2, size, xOffset, yOffset);
+		drawPath(window, graph2, path2, size, xOffset, yOffset);
 		window.display();
 	}
+	std::cout << "huh" << std::endl;
 	delete graph1;
 	delete graph2;
+	std::cout << "done" << std::endl;
 	return 0;
 }
