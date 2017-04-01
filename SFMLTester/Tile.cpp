@@ -2,30 +2,30 @@
 #include <iostream>
 
 bool Tile::isWall() {
-	return wall;
+    return wall;
 }
 
 int Tile::getValue() {
-	return value;
+    return value;
 }
 
 void Tile::setWall(bool w) {
-	wall = w;
+    wall = w;
 }
 
 void Tile::setValue(int v) {
-	value = v;
+    value = v;
 }
 
 Tile::Tile() {
-	wall = false;
-	value = 1;
+    wall = false;
+    value = 1;
 }
 
 Tile::Tile(bool w = false, int v = 1) : wall(w), value(v) {}
 Tile::~Tile() {}
 
 std::ostream & operator<<(std::ostream & os, Tile & t) {
-	os << t.getValue();
-	return os;
+    os << t.getValue();
+    return os;
 }
