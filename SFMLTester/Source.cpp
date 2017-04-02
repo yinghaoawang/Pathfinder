@@ -22,7 +22,7 @@ std::vector<sf::RectangleShape> gridToRects(Grid *grid, int size = 5, int xOffse
             sf::RectangleShape rect(sf::Vector2f(size, size));
 
             Tile &tile = grid->getTileAt(x, y);
-            if (tile.isWall()) rect.setFillColor(sf::Color::Cyan);
+            if (tile.isWall()) rect.setFillColor(sf::Color(30, 30, 30));
             else if (grid->isSource(x, y)) rect.setFillColor(sf::Color::Yellow);
             else if (grid->isDest(x, y)) rect.setFillColor(sf::Color::Red);
             else rect.setFillColor(sf::Color::White);
@@ -77,7 +77,7 @@ int main() {
     */
 
 
-    Grid *grid1 = new Grid(50, 50);
+    Grid *grid1 = new Grid(20, 20);
     grid1->generateMaze();
 
     std::vector<std::pair<int, int>> path2 = grid1->findPathWithDijkstra();

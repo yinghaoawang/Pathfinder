@@ -4,7 +4,7 @@ First time writing search algorithms and using SFML.
 
 ## Progress
 ### 4/01/2017
-![4-01-2017](http://i.imgur.com/56KYgeM.gifv)
+![4-01-2017](http://i.imgur.com/56KYgeM.gif)
 
 *Clicking on the tiles will toggle their wall status.*
 

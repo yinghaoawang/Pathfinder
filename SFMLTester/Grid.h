@@ -18,8 +18,8 @@ public:
     Grid(int width, int height);
     std::vector<std::pair<int, int>> getNeighbors(int x, int y);
     std::vector<std::pair<int, int>> getNeighbors(std::pair<int, int> vertex);
-    std::vector<std::pair<int, int>> getMazeNeighbors(int xPos, int yPos, bool ** visited);
-    std::vector<std::pair<int, int>> getMazeNeighbors(std::pair<int, int> vertex, bool ** visited);
+    std::vector<std::pair<int, int>> getMazeNeighbors(int xPos, int yPos);
+    std::vector<std::pair<int, int>> getMazeNeighbors(std::pair<int, int> vertex);
     //std::vector<std::pair<int, int>> getMazeNeighbors(int xPos, int yPos);
     //std::vector<std::pair<int, int>> getMazeNeighbors(std::pair<int, int> vertex);
     void generateMaze();

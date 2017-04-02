@@ -45,20 +45,21 @@ std::vector<std::pair<int, int>> Grid::getNeighbors(std::pair<int, int> vertex) 
 }
 
 // Get adjacent tiles that are 2 tiles away, does not matter if they're walls
-std::vector<std::pair<int, int>> Grid::getMazeNeighbors(int xPos, int yPos, bool **visited) {
+// 2 Tiles away because 1 tile away represents the walls of the maze
+std::vector<std::pair<int, int>> Grid::getMazeNeighbors(int xPos, int yPos) {
     std::vector<std::pair<int, int>> result;
     for (int x = -2; x <= 2; x += 2) {
         for (int y = -2; y <= 2; y += 2) {
             if (std::abs(x) == std::abs(y)) continue;
             if (x + xPos < 0 || y + yPos < 0 || x + xPos >= width || y + yPos >= height) continue;
-            if (visited[y + yPos][x + xPos] == true) continue;
+            //if (visited[y + yPos][x + xPos] == true) continue;
             result.push_back(std::make_pair(x + xPos, y + yPos));
         }
     }
     return result;
 }
-std::vector<std::pair<int, int>> Grid::getMazeNeighbors(std::pair<int, int> vertex, bool **visited) {
-    return getMazeNeighbors(vertex.first, vertex.second, visited);
+std::vector<std::pair<int, int>> Grid::getMazeNeighbors(std::pair<int, int> vertex) {
+    return getMazeNeighbors(vertex.first, vertex.second);
 }
 
 void printListOfPairs(std::vector<std::pair<int, int>> vector) {
@@ -66,6 +67,16 @@ void printListOfPairs(std::vector<std::pair<int, int>> vector) {
         //std::cout << "(" << it->first << ", " << it->second << ") ";
     }
     //std::cout << std::endl;
+}
+
+
+// A little helper that checks if a vector contains a pair
+bool listPairContains(std::vector<std::pair<int, int>> vector, std::pair<int, int> pair) {
+    for (auto it = vector.begin(), end = vector.end(); it != end; ++it) {
+        std::cout << it->first << ", " << it->second << " =?= " << pair.first << ", " << pair.second << std::endl;
+        if (it->first == pair.first && it->second == pair.second) return true;
+    }
+    return false;
 }
 
 // Generate a maze using prim's algorithm
@@ -81,55 +92,60 @@ void Grid::generateMaze() {
         }
     }
 
-    // prim's algorithm
-    std::vector<std::pair<int, int>> cells;
+    // randomized prim's algorithm
+    std::vector<std::pair<int, int>> frontier;
     // choose a random cell, mark it as visited, and add it to the vector
-    //std::pair<int, int> cell = std::make_pair(rand() % width, rand() % height);
-    std::pair<int, int> cell = std::make_pair(0, 0);
-    visited[cell.second][cell.first] = true;
-    cells.push_back(cell);
+    int randX = rand() % width;
+    int randY = rand() % height;
+    std::pair<int, int> cell = std::make_pair(randX, randY);
+    frontier.push_back(cell);
     
     // while there are cells on the vector
-    while (!cells.empty()) {
-        //std::cout << cells.size() << std::endl;
-        //printListOfPairs(cells);
-        // pick a cell off the vector
-        cell = cells.back();
-        cells.pop_back();
+    while (!frontier.empty()) {
+        // pick a cell off the vector (a random cell)
+        std::random_shuffle(frontier.begin(), frontier.end());
+        cell = frontier.back();
+        frontier.pop_back();
+        int x = cell.first;
+        int y = cell.second;
+
         // add its neighbors to the vector
-        std::vector<std::pair<int, int>> neighbors = getMazeNeighbors(cell, visited);
-        cells.insert(cells.end(), neighbors.begin(), neighbors.end());
-        std::unique(cells.begin(), cells.end()); // removes duplicates
-        // knock down a wall between it and a neighbor
-        std::random_shuffle(neighbors.begin(), neighbors.end()); // randomize the neighbors array
+        std::vector<std::pair<int, int>> neighbors = getMazeNeighbors(cell);
+        std::random_shuffle(neighbors.begin(), neighbors.end()); // I want a random neighbor
+        bool knockedDown = false; // only knock down a single wall
         for (auto it = neighbors.begin(), end = neighbors.end(); it != end; ++it) {
-            int x = cell.first;
-            int y = cell.second;
             int neighX = it->first;
             int neighY = it->second;
-            /*
-            std::cout << "cell: " << x << " " << y << std::endl;
-            std::cout << "neigh: " << neighX << " " << neighY << std::endl;
-            std::cout << "between: " << ((x + neighX) / 2)<< " " << ((y + neighY) / 2) << std::endl;
-            */
-            Tile &tileInBetween = getTileAt(((x + neighX) / 2), ((y + neighY) / 2));
-            if (tileInBetween.isWall()) {
-                tileInBetween.setWall(false);
-                //std::cout << "visited[" << y << "][" << x << "]" << std::endl;
-                break;
+            if (visited[neighY][neighX]) { // only knocks down a wall if it's connected to a visited cell (makes the maze have a sol.)
+                if (!knockedDown) {
+                    Tile &tileInBetween = getTileAt(((x + neighX) / 2), ((y + neighY) / 2));
+                    // knock down a wall between it and a neighbor
+                    tileInBetween.setWall(false);
+                    knockedDown = true;
+                }
+            } else {
+                frontier.push_back(*it); // add its unvisited neighbors to the frontier
             }
         }
+        std::unique(frontier.begin(), frontier.end()); // removes duplicates
+
         // mark that cell visited
-        getTileAt(cell.first, cell.second).setWall(false);
-        visited[cell.second][cell.first] = true;
+        getTileAt(x, y).setWall(false); // hard to explain, but necessary
+        visited[y][x] = true;
     }
-    setSource(0, 0);
+    
+    // Set the source and destination from the top left to bottom right
+    // This is complicated due to random selection as I must prevent the source and dest from being placed on a wall
+    int evenRandX = (randX % 2 == 0) ? 1 : 0;
+    int evenRandY = (randY % 2 == 0) ? 1 : 0;
+
+    setSource(1 - evenRandX, 1 - evenRandY); // index 0 if even, index 1 if odd
+
     int destX = width - 1;
     int destY = height - 1;
-    if (width % 2 == 0) --destX;
-    if (height % 2 == 0) --destY;
+    if (width % 2 == 0) destX -= evenRandX;
+    if (height % 2 == 0) destY -= evenRandY;
     setDest(destX, destY);
-    //std::cout << "dest: " << dest.first << " " << dest.second << std::endl;
 
     // free
     for (int y = 0; y < height; ++y) {
