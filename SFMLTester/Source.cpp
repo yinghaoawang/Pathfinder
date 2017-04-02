@@ -30,19 +30,16 @@ int main() {
     float yOffset = 10;
 
     Grid *grid1 = new Grid(40, 40);
-    MazeGenerator().generateAnimated(&window, *grid1, 50, size, xOffset, yOffset);
-
-    std::vector<std::pair<int, int>> path2 = PathFinder().findPathWithDijkstra(*grid1);
-
+    MazeGenerator mazeGenerator = MazeGenerator(grid1);
+    //mazeGenerator.generateAnimated(&window, 50, size, xOffset, yOffset);
+    sf::sleep(sf::seconds(4));
     while (window.isOpen()) {
         sf::Event event;
+
         window.clear();
 
-        std::vector<sf::RectangleShape> tiles = gridToRects(grid1, size, xOffset, yOffset);
-        drawRects(window, tiles);
-
-        std::vector<sf::RectangleShape> path = pairsToRects(path2, size, xOffset, yOffset);
-        drawRects(window, path);
+        mazeGenerator.generateAnimatedStep(&window, size, xOffset, yOffset);
+        sf::sleep(sf::milliseconds(1));
 
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
@@ -58,7 +55,7 @@ int main() {
                     Tile &tile = grid1->getTileAt(xIndex, yIndex);
                     bool tileIsWall = grid1->getTileAt(xIndex, yIndex).isWall();
                     tile.setWall(!tileIsWall);
-                    path2 = PathFinder().findPathWithDijkstra(*grid1);
+                   // path2 = PathFinder().findPathWithDijkstra(*grid1);
                 }
             }
         }

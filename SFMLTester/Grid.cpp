@@ -92,8 +92,8 @@ bool Grid::isDest(int x, int y) { return dest.first == x && dest.second == y; }
 std::pair<int, int> Grid::getSource() { return source; }
 std::pair<int, int> Grid::getDest() { return dest; }
 int Grid::getWidth() { return width; }
-int Grid::getHeight() {return height; }
-Tile &Grid::getTileAt(int x, int y) {return tiles[y][x]; }
+int Grid::getHeight() { return height; }
+Tile &Grid::getTileAt(int x, int y) { return tiles[y][x]; }
 void Grid::setSource(int x, int y) { source = std::make_pair(x, y); }
 void Grid::setDest(int x, int y) { dest = std::make_pair(x, y); }
 

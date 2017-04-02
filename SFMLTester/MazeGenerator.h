@@ -3,10 +3,19 @@
 
 class MazeGenerator {
 private:
-    std::vector<std::pair<int, int>> MazeGenerator::getMazeNeighbors(Grid &grid, int xPos, int yPos);
-    std::vector<std::pair<int, int>> getMazeNeighbors(Grid & grid, std::pair<int, int> vertex);
+    Grid *grid;
+    bool **visited;
+    std::vector<std::pair<int, int>> frontier;
+    bool generationFinished;
     
+    std::vector<std::pair<int, int>> getMazeNeighbors(int xPos, int yPos);
+    std::vector<std::pair<int, int>> getMazeNeighbors(std::pair<int, int> vertex);
 public:
-    void generate(Grid & grid);
-    void MazeGenerator::generateAnimated(sf::RenderWindow *window, Grid &grid, int msDelay, int size, int xOffset, int yOffset);
+    MazeGenerator(Grid *g);
+    ~MazeGenerator();
+
+    bool isGenerationFinished();
+
+    void generateAnimatedStep(sf::RenderWindow * window, int size, int xOffset, int yOffset);
+    void generate();
 };
