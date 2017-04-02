@@ -11,6 +11,8 @@
 #include <iostream>
 #include <random>
 #include <time.h>
+#include "MazeGenerator.h"
+#include "PathFinder.h"
 #include "Tile.h"
 #include "Grid.h"
 #include "Utility.h"
@@ -27,11 +29,10 @@ int main() {
     float xOffset = 10;
     float yOffset = 10;
 
-    Grid *grid1 = new Grid(10, 10);
-    grid1->generateMazeAnimated(&window, 200, size, xOffset, yOffset);
-    //grid1->generateMaze();
+    Grid *grid1 = new Grid(40, 40);
+    MazeGenerator().generateAnimated(&window, *grid1, 50, size, xOffset, yOffset);
 
-    std::vector<std::pair<int, int>> path2 = grid1->findPathWithDijkstra();
+    std::vector<std::pair<int, int>> path2 = PathFinder().findPathWithDijkstra(*grid1);
 
     while (window.isOpen()) {
         sf::Event event;
@@ -57,7 +58,7 @@ int main() {
                     Tile &tile = grid1->getTileAt(xIndex, yIndex);
                     bool tileIsWall = grid1->getTileAt(xIndex, yIndex).isWall();
                     tile.setWall(!tileIsWall);
-                    path2 = grid1->findPathWithDijkstra();
+                    path2 = PathFinder().findPathWithDijkstra(*grid1);
                 }
             }
         }
