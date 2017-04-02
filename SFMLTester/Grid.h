@@ -2,6 +2,7 @@
 #include <vector>
 #include <ostream>
 #include "Tile.h"
+#include <SFML/Graphics.hpp>
 
 class Grid {
 private:
@@ -20,9 +21,11 @@ public:
     std::vector<std::pair<int, int>> getNeighbors(std::pair<int, int> vertex);
     std::vector<std::pair<int, int>> getMazeNeighbors(int xPos, int yPos);
     std::vector<std::pair<int, int>> getMazeNeighbors(std::pair<int, int> vertex);
+    void generateMazeAnimated(sf::RenderWindow * window, int msDelay, int size, int xOffset, int yOffset);
     //std::vector<std::pair<int, int>> getMazeNeighbors(int xPos, int yPos);
     //std::vector<std::pair<int, int>> getMazeNeighbors(std::pair<int, int> vertex);
     void generateMaze();
+    void generateMazeAnimated(sf::RenderWindow & window, int delay, int size, int xOffset, int yOffset);
     std::vector<std::pair<int, int>> findPathWithDijkstra();
     Grid(std::string strMap);
     ~Grid();

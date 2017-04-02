@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include "Utility.h"
 
 // inf uses a sentinel value, do not like, maybe change?
 #define INF 999999999 // infinity
@@ -62,25 +63,8 @@ std::vector<std::pair<int, int>> Grid::getMazeNeighbors(std::pair<int, int> vert
     return getMazeNeighbors(vertex.first, vertex.second);
 }
 
-void printListOfPairs(std::vector<std::pair<int, int>> vector) {
-    for (auto it = vector.begin(), end = vector.end(); it != end; ++it) {
-        //std::cout << "(" << it->first << ", " << it->second << ") ";
-    }
-    //std::cout << std::endl;
-}
-
-
-// A little helper that checks if a vector contains a pair
-bool listPairContains(std::vector<std::pair<int, int>> vector, std::pair<int, int> pair) {
-    for (auto it = vector.begin(), end = vector.end(); it != end; ++it) {
-        std::cout << it->first << ", " << it->second << " =?= " << pair.first << ", " << pair.second << std::endl;
-        if (it->first == pair.first && it->second == pair.second) return true;
-    }
-    return false;
-}
-
 // Generate a maze using prim's algorithm
-void Grid::generateMaze() {
+void Grid::generateMazeAnimated(sf::RenderWindow *window, int msDelay, int size, int xOffset, int yOffset) {
     bool **visited = new bool*[height];
 
     // fill the grid up with walls
@@ -102,36 +86,45 @@ void Grid::generateMaze() {
     
     // while there are cells on the vector
     while (!frontier.empty()) {
+        
         // pick a cell off the vector (a random cell)
         std::random_shuffle(frontier.begin(), frontier.end());
         cell = frontier.back();
         frontier.pop_back();
         int x = cell.first;
         int y = cell.second;
+        if (visited[y][x]) continue;
+        getTileAt(x, y).setWall(false); // hard to explain, but necessary
 
         // add its neighbors to the vector
+        bool wallDowned = false; // keeps track of whether a wall has been knocked down
         std::vector<std::pair<int, int>> neighbors = getMazeNeighbors(cell);
         std::random_shuffle(neighbors.begin(), neighbors.end()); // I want a random neighbor
-        bool knockedDown = false; // only knock down a single wall
         for (auto it = neighbors.begin(), end = neighbors.end(); it != end; ++it) {
             int neighX = it->first;
             int neighY = it->second;
+            
             if (visited[neighY][neighX]) { // only knocks down a wall if it's connected to a visited cell (makes the maze have a sol.)
-                if (!knockedDown) {
+                if (!wallDowned) { // only want to knock down 1 wall
                     Tile &tileInBetween = getTileAt(((x + neighX) / 2), ((y + neighY) / 2));
                     // knock down a wall between it and a neighbor
                     tileInBetween.setWall(false);
-                    knockedDown = true;
+                    wallDowned = true;
                 }
-            } else {
-                frontier.push_back(*it); // add its unvisited neighbors to the frontier
             }
+            else frontier.push_back(*it); // add its unvisited neighbors to the frontier
         }
         std::unique(frontier.begin(), frontier.end()); // removes duplicates
 
         // mark that cell visited
-        getTileAt(x, y).setWall(false); // hard to explain, but necessary
         visited[y][x] = true;
+        std::vector<sf::RectangleShape> tiles = gridToRects(this, size, xOffset, yOffset);
+        
+        if (window == nullptr) continue;
+
+        drawRects(*window, tiles);
+        window->display();
+        sf::sleep(sf::milliseconds(msDelay));
     }
     
     // Set the source and destination from the top left to bottom right
@@ -152,6 +145,11 @@ void Grid::generateMaze() {
         delete[] visited[y];
     }
     delete visited;
+}
+
+// Generate a maze using prim's algorithm
+void Grid::generateMaze() {
+    generateMazeAnimated((sf::RenderWindow*)nullptr, 0, 0, 0, 0);
 }
 
 // Returns a vector of coordinates of the shortest path from source to dest using Dijkstra's algorithm
@@ -317,6 +315,7 @@ Tile &Grid::getTileAt(int x, int y) {
     return tiles[y][x];
 }
 
+// Randomizes tiles, does not create source or account for passages. Completely random.
 void Grid::randomizeTiles() {
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
