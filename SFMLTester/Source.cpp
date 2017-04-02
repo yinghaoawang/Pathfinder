@@ -14,7 +14,9 @@
 #include "Tile.h"
 #include "Grid.h"
 
-void drawGrid(sf::RenderWindow &window, Grid *grid, int size = 5, int xOffset = 10, int yOffset = 10) {
+// Returns a representation of a grid as Rectangle Shapes
+std::vector<sf::RectangleShape> gridToRects(Grid *grid, int size = 5, int xOffset = 10, int yOffset = 10) {
+    std::vector<sf::RectangleShape> rects;
     for (int y = 0; y < grid->getHeight(); ++y) {
         for (int x = 0; x < grid->getWidth(); ++x) {
             sf::RectangleShape rect(sf::Vector2f(size, size));
@@ -29,13 +31,23 @@ void drawGrid(sf::RenderWindow &window, Grid *grid, int size = 5, int xOffset = 
             rect.setOutlineThickness(1);
             rect.setOutlineColor(sf::Color::Black);
 
-            window.draw(rect);
+            rects.push_back(rect);
         }
+    }
+    return rects;
+}
+
+// Given a list of Rectangle Shapes, they are drawn on the window
+void drawRects(sf::RenderWindow &window, std::vector<sf::RectangleShape> &rects) {
+    for (auto it = rects.begin(), end = rects.end(); it != end; ++it) {
+        window.draw(*it);
     }
 }
 
-void drawPath(sf::RenderWindow &window, Grid *grid, std::vector<std::pair<int, int>> pathList, int size = 5, int xOffset = 10, int yOffset = 10) {
-    for (auto it = pathList.begin(), end = pathList.end(); it != end; ++it) {
+// A list of pairs to a list of Rectangle Shapes
+std::vector<sf::RectangleShape> pairsToRects(std::vector<std::pair<int, int>> &pairList, int size = 5, int xOffset = 10, int yOffset = 10) {
+    std::vector < sf::RectangleShape> rects;
+    for (auto it = pairList.begin(), end = pairList.end(); it != end; ++it) {
         sf::RectangleShape rect(sf::Vector2f(size, size));
         std::pair<int, int> coords = *it;
         rect.setFillColor(sf::Color::Blue);
@@ -43,8 +55,9 @@ void drawPath(sf::RenderWindow &window, Grid *grid, std::vector<std::pair<int, i
         rect.setPosition(sf::Vector2f(xOffset + coords.first * size, yOffset + coords.second * size));
         rect.setOutlineThickness(1);
         rect.setOutlineColor(sf::Color::Black);
-        window.draw(rect);
+        rects.push_back(rect);
     }
+    return rects;
 }
 
 int main() {
@@ -53,54 +66,60 @@ int main() {
 
     // Random seed
     srand(time(0));
-    sf::RenderWindow window(sf::VideoMode(800, 640), "Pathfinder");
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
+    sf::RenderWindow window(sf::VideoMode(800, 800), "Pathfinder");
+    /*
     Grid *graph1 = new Grid(std::string(
         "##      ###  ## #  ###      #D\n"
         "#  #               ##  #  # # \n"
         "#  ## ### ### # ###           \n"
         "S    #########       #    #  #\n"
     ));
-
-
-    Grid *graph2 = new Grid(50, 50);
-    graph2->generateMaze();
-    //graph2->randomizeTiles();
-
-    std::vector<std::pair<int, int>> path1 = graph1->findPathWithDijkstra();
-    std::vector<std::pair<int, int>> path2 = graph2->findPathWithDijkstra();
-
-    /*
-    graph->randomizeTiles();
-    std::cout << *graph << std::endl;
-    graph->randomizeTiles();
     */
 
-    std::cout << *graph1 << std::endl;
+
+    Grid *grid1 = new Grid(50, 50);
+    grid1->generateMaze();
+
+    std::vector<std::pair<int, int>> path2 = grid1->findPathWithDijkstra();
+
     while (window.isOpen()) {
         sf::Event event;
 
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
+
         window.clear();
 
         float size = 10;
         float xOffset = 10;
         float yOffset = 10;
-        drawGrid(window, graph1, size, xOffset, yOffset);
-        drawPath(window, graph1, path1, size, xOffset, yOffset);
 
-        yOffset = 2 * yOffset + size * graph1->getHeight();
-        drawGrid(window, graph2, size, xOffset, yOffset);
-        drawPath(window, graph2, path2, size, xOffset, yOffset);
+        std::vector<sf::RectangleShape> tiles = gridToRects(grid1, size, xOffset, yOffset);
+        drawRects(window, tiles);
+
+        std::vector<sf::RectangleShape> path = pairsToRects(path2, size, xOffset, yOffset);
+        drawRects(window, path);
+
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
+                window.close();
+            if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+                sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+                // Mouse position to tile indices
+                int xIndex = mousePos.x / size - xOffset / size;
+                int yIndex = mousePos.y / size - yOffset / size;
+                
+                // If within bounds of the grid, toggle the wall status
+                if (xIndex >= 0 && yIndex >= 0 && xIndex < grid1->getWidth() && yIndex < grid1->getHeight()) {
+                    Tile &tile = grid1->getTileAt(xIndex, yIndex);
+                    bool tileIsWall = grid1->getTileAt(xIndex, yIndex).isWall();
+                    tile.setWall(!tileIsWall);
+                    path2 = grid1->findPathWithDijkstra();
+                }
+            }
+        }
+
         window.display();
     }
-    std::cout << "huh" << std::endl;
-    delete graph1;
-    delete graph2;
+    delete grid1;
     std::cout << "done" << std::endl;
     return 0;
 }

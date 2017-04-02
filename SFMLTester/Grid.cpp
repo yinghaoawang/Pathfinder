@@ -63,9 +63,9 @@ std::vector<std::pair<int, int>> Grid::getMazeNeighbors(std::pair<int, int> vert
 
 void printListOfPairs(std::vector<std::pair<int, int>> vector) {
     for (auto it = vector.begin(), end = vector.end(); it != end; ++it) {
-        std::cout << "(" << it->first << ", " << it->second << ") ";
+        //std::cout << "(" << it->first << ", " << it->second << ") ";
     }
-    std::cout << std::endl;
+    //std::cout << std::endl;
 }
 
 // Generate a maze using prim's algorithm
@@ -91,7 +91,7 @@ void Grid::generateMaze() {
     
     // while there are cells on the vector
     while (!cells.empty()) {
-        std::cout << cells.size() << std::endl;
+        //std::cout << cells.size() << std::endl;
         //printListOfPairs(cells);
         // pick a cell off the vector
         cell = cells.back();
@@ -107,13 +107,15 @@ void Grid::generateMaze() {
             int y = cell.second;
             int neighX = it->first;
             int neighY = it->second;
+            /*
             std::cout << "cell: " << x << " " << y << std::endl;
             std::cout << "neigh: " << neighX << " " << neighY << std::endl;
             std::cout << "between: " << ((x + neighX) / 2)<< " " << ((y + neighY) / 2) << std::endl;
+            */
             Tile &tileInBetween = getTileAt(((x + neighX) / 2), ((y + neighY) / 2));
             if (tileInBetween.isWall()) {
                 tileInBetween.setWall(false);
-                std::cout << "visited[" << y << "][" << x << "]" << std::endl;
+                //std::cout << "visited[" << y << "][" << x << "]" << std::endl;
                 break;
             }
         }
@@ -127,7 +129,7 @@ void Grid::generateMaze() {
     if (width % 2 == 0) --destX;
     if (height % 2 == 0) --destY;
     setDest(destX, destY);
-    std::cout << "dest: " << dest.first << " " << dest.second << std::endl;
+    //std::cout << "dest: " << dest.first << " " << dest.second << std::endl;
 
     // free
     for (int y = 0; y < height; ++y) {
@@ -176,8 +178,8 @@ std::vector<std::pair<int, int>> Grid::findPathWithDijkstra() {
         if (u.first == UNDEF || u.second == UNDEF) break;
         unvisited.erase(std::remove(unvisited.begin(), unvisited.end(), u), unvisited.end());
 
-        std::cout << unvisited.size() << std::endl;
-        std::cout << "(" << u.first << ", " << u.second << "): " << dist[u.second][u.first] << std::endl;
+        //std::cout << unvisited.size() << std::endl;
+        //std::cout << "(" << u.first << ", " << u.second << "): " << dist[u.second][u.first] << std::endl;
         std::vector<std::pair<int, int>> neighbors = getNeighbors(u);
         for (auto it = neighbors.begin(), end = neighbors.end(); it != end; ++it) {
             std::pair<int, int> v = *it;

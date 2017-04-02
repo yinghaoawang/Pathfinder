@@ -3,6 +3,10 @@ Use different algorithms to find the shortest path in a 2d grid.
 First time writing search algorithms and using SFML.
 
 ## Progress
+### 4/01/2017
+![4-01-2017](http://i.imgur.com/56KYgeM.gifv)
+
+*Clicking on the tiles will toggle their wall status.*
 
 ### 3/31/2017
 ![3-31-2017](https://i.imgur.com/LdGksmq.png)
