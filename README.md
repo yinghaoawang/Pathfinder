@@ -5,7 +5,7 @@ First time writing search algorithms and using SFML.
 
 ## Progress
 ### 4/02/2017
-![4-02-2017](http://i.imgur.com/KArF9mY.gif)
+![4-02-2017](http://i.imgur.com/ej4gLVQ.gif)
 
 *Modularized maze generation, pathfinding, tile holding.  
 Displays frontier tiles during maze generation steps.  
