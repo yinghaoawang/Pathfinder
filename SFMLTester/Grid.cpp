@@ -20,6 +20,7 @@ Grid::Grid(int w, int h) : width(w), height(h) {
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
             // i.e Value of a 3x3 map i (from bottom to top) 0 1 2, 3 4 5, 6 7 8
+            // These values don't really mean anything for now
             tiles[y][x].setValue(height * y + x);
         }
     }

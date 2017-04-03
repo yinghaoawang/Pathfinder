@@ -1,13 +1,15 @@
 # Pathfinder
-Use different algorithms to find the shortest path in a 2d grid.  
-First time writing search algorithms and using SFML.
+Use different algorithms to find the shortest path in a 2D grid.  
+First time writing search algorithms and using SFML.  
+**Now featuring maze generation algorithms**
 
 ## Progress
 ### 4/02/2017
-![4-02-2017](http://i.imgur.com/FRQQ56V.gif)
+![4-02-2017](http://i.imgur.com/KArF9mY.gif)
 
 *Modularized maze generation, pathfinding, tile holding.  
-Displays frontier tiles during maze generation steps.*
+Displays frontier tiles during maze generation steps.
+Displays Dijkstra's search steps*
 
 ### 4/01-2017 Midnight
 ![4-01-2017](http://i.imgur.com/mYr6yua.gif)

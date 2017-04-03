@@ -31,15 +31,24 @@ int main() {
 
     Grid *grid1 = new Grid(40, 40);
     MazeGenerator mazeGenerator = MazeGenerator(grid1);
-    //mazeGenerator.generateAnimated(&window, 50, size, xOffset, yOffset);
+    PathFinder pathFinder = PathFinder(grid1);
+
     sf::sleep(sf::seconds(4));
+    //mazeGenerator.generateAnimated(&window, 50, size, xOffset, yOffset);
     while (window.isOpen()) {
         sf::Event event;
 
         window.clear();
 
-        mazeGenerator.generateAnimatedStep(&window, size, xOffset, yOffset);
-        sf::sleep(sf::milliseconds(1));
+        // generate maze if has not generated
+        if (!mazeGenerator.isGenerationFinished()) {
+            mazeGenerator.generateAnimatedStep(&window, size, xOffset, yOffset);
+            sf::sleep(sf::milliseconds(1));
+        } else { // otherwise find the path
+            pathFinder.dijkstraPathAnimatedStep(&window, size, xOffset, yOffset);
+            sf::sleep(sf::milliseconds(1));
+        }
+        
 
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
@@ -55,14 +64,16 @@ int main() {
                     Tile &tile = grid1->getTileAt(xIndex, yIndex);
                     bool tileIsWall = grid1->getTileAt(xIndex, yIndex).isWall();
                     tile.setWall(!tileIsWall);
-                   // path2 = PathFinder().findPathWithDijkstra(*grid1);
+                    // Resets the pathfinder so that it must search again
+                    pathFinder.reset();
                 }
+                
             }
         }
 
         window.display();
     }
+
     delete grid1;
-    std::cout << "done" << std::endl;
     return 0;
 }
