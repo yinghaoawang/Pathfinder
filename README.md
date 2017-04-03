@@ -8,7 +8,7 @@ First time writing search algorithms and using SFML.
 ![4-02-2017](http://i.imgur.com/KArF9mY.gif)
 
 *Modularized maze generation, pathfinding, tile holding.  
-Displays frontier tiles during maze generation steps.
+Displays frontier tiles during maze generation steps.  
 Displays Dijkstra's search steps*
 
 ### 4/01-2017 Midnight
