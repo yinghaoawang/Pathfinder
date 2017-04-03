@@ -1,12 +1,16 @@
 // Finds memory leaks
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
+/*
 #include <crtdbg.h>
 #ifdef _DEBUG
 #define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #define new DEBUG_NEW
 #endif
+*/
 
+#include <SFML/Window.hpp>
+#include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <random>
@@ -18,8 +22,10 @@
 #include "Utility.h"
 
 int main() {
+/*
     // Detects memory leaks
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+*/
 
     // Random seed
     srand(time(0));
@@ -33,7 +39,6 @@ int main() {
     MazeGenerator mazeGenerator = MazeGenerator(grid1);
     PathFinder pathFinder = PathFinder(grid1);
 
-    sf::sleep(sf::seconds(4));
     //mazeGenerator.generateAnimated(&window, 50, size, xOffset, yOffset);
     while (window.isOpen()) {
         sf::Event event;

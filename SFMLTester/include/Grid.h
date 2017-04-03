@@ -1,4 +1,6 @@
 #pragma once
+#ifndef GRID_H_
+#define GRID_H_
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <ostream>
@@ -15,11 +17,11 @@ private:
     Tile **tiles;
 
 public:
-    Grid(int width, int height);
-    
     // inf uses a sentinel value, do not like, maybe change?
-    static const int INF = 999999999; // infinity
-    static const int UNDEF = -1; // undefined
+    static const int INF; // infinity
+    static const int UNDEF; // undefined
+
+    Grid(int width, int height);
 
     std::vector<std::pair<int, int>> getNeighbors(int x, int y);
     std::vector<std::pair<int, int>> getNeighbors(std::pair<int, int> vertex);
@@ -40,3 +42,5 @@ public:
     void randomizeTiles();
     friend std::ostream& operator<<(std::ostream &os, Grid &g);
 };
+
+#endif

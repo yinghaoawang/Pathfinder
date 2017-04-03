@@ -6,6 +6,9 @@
 #include <algorithm>
 #include "Utility.h"
 
+const int Grid::INF = 999999999;
+const int Grid::UNDEF = -1;
+
 // Constructor takes in width and height of grid
 Grid::Grid(int w, int h) : width(w), height(h) {
     width = w;
